@@ -1,0 +1,44 @@
+-- Draft/AllLaczExist.lean -- aggregator for the existence-direction formalization of Laczkovich (Discrete Math. 140 (1995)) Sect. 2:
+-- Lemma 2.1, Lemma 2.2 (i)-(iii) (chart form), Theorem 2.4 first triple (Fig. 4), witnesses.  NOTE, UNAUDITED.
+-- Credit: Laczkovich (Discrete Math. 140 (1995) 79-94), Beeson, Beeson-Zhang, Zhang.
+import Erdos634.Draft.LaczFormalL21
+import Erdos634.Draft.LaczFormalL22Base
+import Erdos634.Draft.LaczFormalL22Grid
+import Erdos634.Draft.LaczFormalL22Par
+import Erdos634.Draft.LaczFormalL22Chart
+import Erdos634.Draft.LaczFormalL22Trap
+import Erdos634.Draft.LaczFormalL22Trap1
+import Erdos634.Draft.LaczFormalL22Trap2
+import Erdos634.Draft.LaczFormalL22Strips
+import Erdos634.Draft.LaczFormalL22Iso
+import Erdos634.Draft.LaczFormalL24Geo
+import Erdos634.Draft.LaczFormalL24Cover
+import Erdos634.Draft.LaczFormalL24Disj
+import Erdos634.Draft.LaczFormalL24Main
+import Erdos634.Draft.LaczFormalL24Wit
+import Erdos634.Draft.LaczFormalL25Geo
+import Erdos634.Draft.LaczFormalL25Main
+import Erdos634.Draft.LaczFormalL25Thm
+import Erdos634.Draft.LaczFormalL25Wit
+import Erdos634.Draft.LaczFormalL26Geo
+import Erdos634.Draft.LaczFormalL26Util
+import Erdos634.Draft.LaczFormalL26Trap
+import Erdos634.Draft.LaczFormalL26Chart
+import Erdos634.Draft.LaczFormalL26Ident
+import Erdos634.Draft.LaczFormalL26Tiles
+import Erdos634.Draft.LaczFormalL26Main
+import Erdos634.Draft.LaczFormalL26Thm
+import Erdos634.Draft.LaczFormalL26Beeson
+import Erdos634.Draft.LaczFormalTransport
+import Erdos634.Draft.LaczFormalTransportCor
+import Erdos634.Draft.LaczFormalTransportWit
+import Erdos634.Draft.LaczFormalL27Any
+import Erdos634.Draft.LaczFormalL28All
+import Erdos634.Draft.LaczFormalL34Final
+import Erdos634.Draft.LaczFormalL35Print
+import Erdos634.Draft.LaczFormalL36Wit
+import Erdos634.Draft.LaczFormalL37Plane
+import Erdos634.Draft.LaczFormalTrapChart
+import Erdos634.Draft.LaczFormalTrapChart2
+import Erdos634.Draft.LaczFormalTrapChart3
+import Erdos634.Draft.LaczFormalTrapChart4

@@ -1,0 +1,23 @@
+import Erdos634.Draft.LaczFormalAFrame
+import Erdos634.Draft.LaczFormalASteps
+import Erdos634.Draft.LaczFormalALLat
+import Erdos634.Draft.LaczFormalALCell
+import Erdos634.Draft.LaczFormalALChord
+import Erdos634.Draft.LaczFormalALTile
+import Erdos634.Draft.LaczFormalALGround
+import Erdos634.Draft.LaczFormalALRow
+import Erdos634.Draft.LaczFormalALStage1
+import Erdos634.Draft.LaczFormalALStage2
+import Erdos634.Draft.LaczFormalALAdv
+import Erdos634.Draft.LaczFormalALBits
+import Erdos634.Draft.LaczFormalALZ
+import Erdos634.Draft.LaczFormalALZA
+import Erdos634.Draft.LaczFormalALZA2
+import Erdos634.Draft.LaczFormalALZA3
+import Erdos634.Draft.LaczFormalALMain
+import Erdos634.Draft.LaczFormalALBridge
+import Erdos634.Draft.LaczFormalALWalk
+import Erdos634.Draft.LaczFormalALFinal
+import Erdos634.Draft.LaczFormalALControl
+import Erdos634.Draft.LaczFormalALGridCtl
+-- Lemma A(j) (thick analogue of M(j)) in Lean: AARule_holds (LaczFormalALFinal).  UNAUDITED.

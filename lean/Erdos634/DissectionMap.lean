@@ -1,0 +1,91 @@
+import Mathlib.AlgebraicTopology.SimplexCategory.Basic
+import Erdos634.Dissection
+
+/-!
+# Transporting a dissection along an affine equivalence
+
+Erdős #634, the scale map.  Five PROVED statements — `thm:ladder`, `cor:ladder`, `prop:inflbdy`,
+`cor:inflcrux`, `prop:inflparity` — wait on a way to move a dissection along a map of the plane.
+The general step is here: an affine equivalence carries a dissection to a dissection, because it
+carries triangles to triangles, unions to unions, and interiors to interiors.
+
+**STALE HEADER, CORRECTED 2026-09-07.**  This file once said it did "not yet give `thm:ladder`
+itself, which needs the subdivision of `kT` into `k²` copies of `T` — a construction, not a
+transport."  That construction **exists**: `Subdivision.ladderDissection` (`CellCoord.lean:527`)
+with `ladderDissection_congruent`, and `Ladder.ladder` is `thm:ladder`, **VERIFIED 2026-09-02**;
+`Compose.compose` closed the composition-map blocker at the same time.  Two independent room
+`tileplace` sessions (Hilbert, Gonthier), blind to each other, both flagged this header as the
+reason they nearly rebuilt closed work.  **A stale "what is missing" note is a rediscovery trap;
+delete or date them.**
+
+Axiom-clean; no `sorry`.
+-/
+
+namespace Erdos634.DissectionMap
+
+open Erdos634.Geometry
+
+/-- The image of a tile under an affine equivalence. -/
+noncomputable def mapTri (e : Plane ≃ᵃ[ℝ] Plane) (T : Tri) : Tri where
+  pts := e ∘ T.pts
+  indep := T.indep.map' e.toAffineMap e.injective
+
+theorem mapTri_carrier (e : Plane ≃ᵃ[ℝ] Plane) (T : Tri) :
+    (mapTri e T).carrier = e '' T.carrier := by
+  simp only [mapTri, Tri.carrier]
+  rw [Set.range_comp]
+  exact (AffineMap.image_convexHull (𝕜 := ℝ) e.toAffineMap (Set.range T.pts)).symm
+
+/-- **A dissection transports.**  An affine equivalence carries a dissection of a triangle to a
+dissection of its image. -/
+noncomputable def mapDissection {N : ℕ} (e : Plane ≃ᵃ[ℝ] Plane) (D : Dissection N) :
+    Dissection N where
+  target := mapTri e D.target
+  tile := fun i => mapTri e (D.tile i)
+  covers := by
+    simp only [mapTri_carrier]
+    rw [← Set.image_iUnion, D.covers]
+  interiors_disjoint := by
+    intro i j hij
+    have h := D.interiors_disjoint hij
+    have hcont : Continuous e := AffineEquiv.continuous_of_finiteDimensional e
+    have hcont' : Continuous e.symm := AffineEquiv.continuous_of_finiteDimensional e.symm
+    let eh : Plane ≃ₜ Plane := ⟨e.toEquiv, hcont, hcont'⟩
+    have himg : ∀ S : Set Plane, interior (e '' S) = e '' interior S := by
+      intro S
+      exact (eh.image_interior S).symm
+    simp only [mapTri_carrier, himg]
+    exact (Set.disjoint_image_iff e.injective).mpr h
+
+theorem mapDissection_target {N : ℕ} (e : Plane ≃ᵃ[ℝ] Plane) (D : Dissection N) :
+    (mapDissection e D).target = mapTri e D.target := rfl
+
+theorem mapDissection_tile {N : ℕ} (e : Plane ≃ᵃ[ℝ] Plane) (D : Dissection N) (i : Fin N) :
+    (mapDissection e D).tile i = mapTri e (D.tile i) := rfl
+
+/-- **An affine equivalence preserves interior-disjointness.** If two triangles' interiors are
+disjoint, so are the interiors of their images under any affine equivalence of the plane — the same
+argument `mapDissection`'s own `interiors_disjoint` field uses, extracted as a standalone, reusable
+fact (needed to transport a certificate's own within-piece disjointness through a placement map,
+e.g. for `CollarDisjointM4`'s collar construction). -/
+theorem mapTri_interiors_disjoint {T U : Tri} (e : Plane ≃ᵃ[ℝ] Plane)
+    (h : Disjoint (interior T.carrier) (interior U.carrier)) :
+    Disjoint (interior (mapTri e T).carrier) (interior (mapTri e U).carrier) := by
+  have hcont : Continuous e := AffineEquiv.continuous_of_finiteDimensional e
+  have hcont' : Continuous e.symm := AffineEquiv.continuous_of_finiteDimensional e.symm
+  let eh : Plane ≃ₜ Plane := ⟨e.toEquiv, hcont, hcont'⟩
+  have himg : ∀ S : Set Plane, interior (e '' S) = e '' interior S := by
+    intro S
+    exact (eh.image_interior S).symm
+  simp only [mapTri_carrier, himg]
+  exact (Set.disjoint_image_iff e.injective).mpr h
+
+/-- Composing two affine equivalences also preserves interior-disjointness (apply the single-map
+version twice) — the shape a placement built from a scale then a translate needs. -/
+theorem mapTri_mapTri_interiors_disjoint {T U : Tri} (e f : Plane ≃ᵃ[ℝ] Plane)
+    (h : Disjoint (interior T.carrier) (interior U.carrier)) :
+    Disjoint (interior (mapTri f (mapTri e T)).carrier)
+      (interior (mapTri f (mapTri e U)).carrier) :=
+  mapTri_interiors_disjoint f (mapTri_interiors_disjoint e h)
+
+end Erdos634.DissectionMap

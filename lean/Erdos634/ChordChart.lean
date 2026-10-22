@@ -1,0 +1,152 @@
+import Erdos634.LayerLink
+
+/-!
+# The chord chart: bridge (i) is derived, not carried
+
+`LayerLink.strip_layer_rigid` consumed two geometric bridges as hypotheses.  The first of them
+is not a hypothesis at all — it follows from the two distance equations that place the tile.
+
+## The chart
+
+The tile at position `j` of the `a`-layer has its `a`-edge on the floor, from `((j-1)a, 0)` to
+`(j·a, 0)`, with the mast at `x = 0`.  Two placements put its body above that edge:
+
+* **unreflected** — apex at distance `c` from the *left* foot, `b` from the right;
+* **reflected** — apex at distance `c` from the *right* foot, `b` from the left.
+
+Each is pinned by two distance equations, and subtracting them gives the apex abscissa in
+closed form with no trigonometry (`abscissa_of_distances`):
+
+  unreflected  `x_u = (a² + c² - b²)/(2a)`,   reflected  `x_r = (a² + b² - c²)/(2a)`.
+
+## Bridge (i), discharged
+
+For the base-`β` tile `(a,b,c) = (ef, f²-e², f²)` the reflected numerator collapses:
+
+  `a² + b² - c² = e²f² + (f²-e²)² - f⁴ = e⁴ - e²f² = e²(e² - f²)`,
+
+which is **negative for every member**, by `e < f` alone.  So the reflected apex has negative
+abscissa: it lies left of the mast, for all `0 < e < f`, with no case split.  Checked exactly at
+`e = 1,2,3` and `f` up to `6`: `x_r` matches `e²(e²-f²)/(2ef)` in every case.
+
+The unreflected numerator is `a² + c² - b² = e²(3f² - e²) = e²N₀`, so `x_u = eN₀/(2f) = S/2`:
+`StripRigid`'s projection defect `S` is exactly twice the unreflected apex abscissa.  That
+identifies `S` geometrically rather than by fiat.
+
+## Bridge (ii), reduced to two proved inequalities
+
+The predecessor's apex sits strictly *right* of the shared foot, since `S/2 > a` is
+`StripRigid.shift_gt_two_a`; the reflected tile's apex sits strictly *left* of it, by the above.
+So the two bodies reach across the same vertical at positive height, which is the overlap.  The
+only step not proved here is that "both reach across it" gives a genuine two-dimensional
+intersection — a single planar statement, down from the whole bridge.
+-/
+
+namespace Erdos634.ChordChart
+
+/-- **The apex abscissa from two distance equations.**  If `(x,y)` is at distance `b` from the
+origin and `c` from `(a,0)`, then `2ax = a² + b² - c²`.  Subtracting the two equations; no
+trigonometry enters. -/
+theorem abscissa_of_distances (a b c x y : ℝ)
+    (h1 : x ^ 2 + y ^ 2 = b ^ 2) (h2 : (x - a) ^ 2 + y ^ 2 = c ^ 2) :
+    2 * a * x = a ^ 2 + b ^ 2 - c ^ 2 := by linear_combination h1 - h2
+
+/-- **The reflected numerator collapses**: `a² + b² - c² = e²(e² - f²)` for the base-`β` tile. -/
+theorem reflected_numerator (e f : ℝ) :
+    (e * f) ^ 2 + (f ^ 2 - e ^ 2) ^ 2 - (f ^ 2) ^ 2 = e ^ 2 * (e ^ 2 - f ^ 2) := by ring
+
+/-- **The unreflected numerator is `e²N₀`**, so `x_u = S/2`: `StripRigid`'s projection defect is
+twice the unreflected apex abscissa. -/
+theorem unreflected_numerator (e f : ℝ) :
+    (e * f) ^ 2 + (f ^ 2) ^ 2 - (f ^ 2 - e ^ 2) ^ 2 = e ^ 2 * (3 * f ^ 2 - e ^ 2) := by ring
+
+/-- **Bridge (i).**  The reflected apex lies strictly left of the mast, for every member.
+`2a·x_r = e²(e² - f²) < 0` and `a > 0`, so `x_r < 0` — by `e < f` alone, no case split. -/
+theorem reflected_apex_left_of_mast (e f x y : ℝ) (he : 0 < e) (hef : e < f)
+    (h1 : x ^ 2 + y ^ 2 = (f ^ 2 - e ^ 2) ^ 2) (h2 : (x - e * f) ^ 2 + y ^ 2 = (f ^ 2) ^ 2) :
+    x < 0 := by
+  have hf : 0 < f := lt_trans he hef
+  have ha : 0 < e * f := mul_pos he hf
+  have hx : 2 * (e * f) * x = e ^ 2 * (e ^ 2 - f ^ 2) := by
+    rw [abscissa_of_distances (e * f) (f ^ 2 - e ^ 2) (f ^ 2) x y h1 h2]
+    exact reflected_numerator e f
+  have hsq : e ^ 2 < f ^ 2 := by nlinarith
+  have hneg : e ^ 2 * (e ^ 2 - f ^ 2) < 0 := by nlinarith [mul_pos he he]
+  by_contra hc
+  push_neg at hc
+  have : 0 ≤ 2 * (e * f) * x := mul_nonneg (by linarith) hc
+  linarith
+
+/-- **Bridge (ii), the arithmetic half.**  The predecessor's apex is strictly right of the
+shared foot: `S/2 > a`, i.e. `e N₀ > 2 a f`, which is `StripRigid.shift_gt_two_a`. -/
+theorem predecessor_apex_right_of_foot (e f : ℤ) (he : 0 < e) (hef : e < f) :
+    2 * (e * f) * f < e * (3 * f ^ 2 - e ^ 2) :=
+  Erdos634.StripRigid.shift_gt_two_a e f he hef
+
+/-! ## Bridge (ii): the planar step, isolated
+
+Both apex abscissae are now pinned.  In the chart the shared foot of positions `j-1` and `j`
+sits at `x = (j-1)a`.  The predecessor's apex lies strictly right of it, since `x_u = S/2 > a`
+(`predecessor_apex_right_of_foot`); the reflected tile's apex lies strictly left of it, since
+`x_r < 0` (`reflected_apex_left_of_mast`).  So the two bodies reach across the same vertical
+line at positive height.
+
+`straddle_of_opposite_signs` records that arithmetic.  What it does **not** give is that two
+triangles reaching across a common vertical at positive height must intersect — a single planar
+statement, and the entire residue of bridge (ii). -/
+
+/-- **The two apexes straddle the shared foot.**  With `x_r < 0 < a < x_u`, the reflected apex
+of position `j` and the unreflected apex of position `j-1` lie on opposite sides of the vertical
+through their shared foot. -/
+theorem straddle_of_opposite_signs (a xu xr : ℝ) (ha : 0 < a) (hu : a < xu) (hr : xr < 0) :
+    xr < a ∧ a < xu := ⟨lt_trans hr ha, hu⟩
+
+/-! ## The planar step: the idea here, the theorem in `ChordChartPlanar`
+
+**CORRECTION 2026-09-10.**  This section previously read "The planar step, proved" and claimed
+that `upward_in_cone` together with `shared_segment_pos` discharge bridge (ii)'s residue.  They do
+not: `upward_in_cone` is a statement about two *vectors* (no triangle, no carrier, no membership),
+and `shared_segment_pos` is `lt_min` on two reals.  Neither mentions a triangle's interior.  The
+missing steps — that a positive combination of the corner's two edge directions, scaled small
+enough, lies in the triangle; that it lies in the *interior*; and that one scale serves both
+triangles — are proved in `Erdos634/ChordChartPlanar.lean`
+(`mem_interior_carrier_of_dets_pos`, `interiors_meet_at_shared_foot`,
+`member_configuration_interiors_meet`).  What follows is the *idea* of that argument; the
+theorem is there.
+
+Bridge (ii)'s residue was: two triangles reaching across a common vertical at positive height
+must intersect.  In this configuration they do, and the reason is elementary.
+
+Both tiles have their `a`-edge on the floor and their body above it, and they share the foot
+`F = ((j-1)a, 0)`.  For the predecessor, the other base end lies **left** of `F` and its apex
+lies **right** of the vertical through `F`.  For the reflected tile, the other base end lies
+**right** of `F` and its apex lies **left**.  In each case the corner cone at `F` is spanned by
+one horizontal direction and one direction into the open upper half-plane *on the other side*,
+and such a cone contains the straight-up direction `(0,1)` (`upward_in_cone`).
+
+So both triangles contain a vertical segment of positive height rising from `F`.  Two such
+segments on the same line from the same point overlap in a segment of positive length, so the
+interiors meet.  `shared_segment_pos` below records only the trivial arithmetic of that last
+sentence (`0 < min h₁ h₂`); the geometric statement is
+`ChordChartPlanar.interiors_meet_at_shared_foot`. -/
+
+/-- **The upward direction lies in the corner cone.**  If one edge from the corner runs to
+`(xB, 0)` with `xB < 0` and the other to `(xA, yA)` with `xA > 0` and `yA > 0`, then `(0,1)` is a
+strictly positive combination of the two: the cone contains straight up. -/
+theorem upward_in_cone (xB xA yA : ℝ) (hB : xB < 0) (hA : 0 < xA) (hyA : 0 < yA) :
+    ∃ s t : ℝ, 0 < s ∧ 0 < t ∧ s * xB + t * xA = 0 ∧ t * yA = 1 := by
+  have hxB : xB ≠ 0 := ne_of_lt hB
+  have hyA' : yA ≠ 0 := ne_of_gt hyA
+  have hprod : yA * xB < 0 := mul_neg_of_pos_of_neg hyA hB
+  refine ⟨-xA / (yA * xB), 1 / yA, ?_, by positivity, ?_, by field_simp⟩
+  · rw [div_pos_iff]
+    exact Or.inr ⟨by linarith, hprod⟩
+  · field_simp
+    ring
+
+/-- **Two positive-height segments from the same point overlap.**  Their common part has
+positive length, so the two bodies share more than the foot. -/
+theorem shared_segment_pos (h₁ h₂ : ℝ) (p₁ : 0 < h₁) (p₂ : 0 < h₂) : 0 < min h₁ h₂ :=
+  lt_min p₁ p₂
+
+end Erdos634.ChordChart

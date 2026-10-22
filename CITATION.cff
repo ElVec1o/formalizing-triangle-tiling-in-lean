@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Formalizing triangle tiling in Lean"
+version: "1.0"
+date-released: "2026-10-22"
+authors:
+  - family-names: Bonfioli
+    given-names: Vico
+abstract: >-
+  Lean 4 / Mathlib formalization of results on tilings of polygons and triangles by congruent and similar
+  triangles (Laczkovich, Beeson, Beeson-Zhang, Zhang, Snover-Waiveris-Williams), with coverage tables and
+  a document of printed gaps found while formalizing. All theorems are unaudited by anyone outside the project.
+keywords:
+  - triangle tiling
+  - Lean 4
+  - Mathlib
+  - formal verification
+license: CC-BY-4.0
